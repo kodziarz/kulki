@@ -10,9 +10,9 @@ export default class Walker extends EventTarget {
     private path: Path
     private worker: Worker
 
-    constructor() {
+    constructor(root) {
         super()
-        this.worker = new Worker("js/worker.js", { type: "module" })
+        this.worker = root
     }
 
     findPath = (start: Field, finish: Field) => {

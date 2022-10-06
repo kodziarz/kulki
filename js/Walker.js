@@ -1,5 +1,5 @@
 export default class Walker extends EventTarget {
-    constructor() {
+    constructor(root) {
         super();
         this.findPath = (start, finish) => {
             this.worker.postMessage({
@@ -8,7 +8,7 @@ export default class Walker extends EventTarget {
                 finish: finish
             });
         };
-        this.worker = new Worker("js/worker.js", { type: "module" });
+        this.worker = root;
     }
 }
 Walker.MESSAGES = {

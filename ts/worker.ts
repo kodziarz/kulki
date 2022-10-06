@@ -3,7 +3,7 @@ import Path from "./Path.js";
 import Walker from "./Walker.js";
 // import scripts
 
-let path = new Path()
+let walker = new Walker(self)
 
 onmessage = (e: any) => {
     console.log(e.data);
@@ -14,6 +14,7 @@ onmessage = (e: any) => {
     switch (e.message) {
         case Walker.MESSAGES.PATHFIND:
             if (!(e.start instanceof Field && e.start instanceof Field)) return null
+            //walker.findPath()
 
             break
     }

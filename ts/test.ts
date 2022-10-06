@@ -16,7 +16,7 @@ export default class Test extends EventTarget {
             this.dispatchEvent(new FieldReachedEvent(new Field(0, 2), new Path()))
         }, 1000)
 
-        let walker = new Walker()
-        walker.findPath(new Field(0, 2), new Field(2, 0))
+        //let walker = new Walker()
+        //walker.findPath(new Field(0, 2), new Field(2, 0))
     }
 }
