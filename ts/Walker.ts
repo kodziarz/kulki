@@ -1,22 +1,25 @@
+import Field from "./Field.js";
 import Path from "./Path.js";
 
+export default class Walker extends EventTarget {
 
-// onmessage = (e) => {
-//     console.log(e.data);
+    static MESSAGES = {
+        PATHFIND: 0
+    }
 
-//     let y: number = 0
-//     for (let i: number = 0; i < 1000000; i++) {
-//         y = Math.sqrt(i)
-//     }
-
-//     //console.log("jestem: ", e.data, ", uzsyskałem: ", y);
-//     self.postMessage("jestem: " + e.data + ", uzyskałem: " + y)
-// 
-export default class Walker {
     private path: Path
     private worker: Worker
 
     constructor() {
-        this.worker = new Worker("js/worker.js")
+        super()
+        this.worker = new Worker("js/worker.js", { type: "module" })
+    }
+
+    findPath = (start: Field, finish: Field) => {
+        this.worker.postMessage({
+            message: Walker.MESSAGES.PATHFIND,
+            start: start,
+            finish: finish
+        })
     }
 }
