@@ -1,5 +1,6 @@
-import Field from "./Field.js";
-import Path from "./Path.js";
+import Field from "./Field";
+import Path from "./Path";
+import FieldReachedEvent from "./walkerEvents/FieldReachedEvent";
 
 export default class Walker extends EventTarget {
 
@@ -10,16 +11,18 @@ export default class Walker extends EventTarget {
     private path: Path
     private worker: Worker
 
-    constructor(root) {
+    constructor(root: Worker) {
         super()
         this.worker = root
     }
 
     findPath = (start: Field, finish: Field) => {
-        this.worker.postMessage({
-            message: Walker.MESSAGES.PATHFIND,
-            start: start,
-            finish: finish
-        })
+        this.path.addField(start)
+        this.dispatchEvent(new FieldReachedEvent(start, this.path))
+        // this.worker.postMessage({
+        //     message: Walker.MESSAGES.PATHFIND,
+        //     start: start,
+        //     finish: finish
+        // })
     }
 }

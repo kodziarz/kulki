@@ -1,9 +1,9 @@
-import Field from "./Field.js";
-import Path from "./Path.js";
-import Walker from "./Walker.js";
+import Field from "./Field";
+import Path from "./Path";
+import Walker from "./Walker";
 // import scripts
 
-let walker = new Walker(self)
+let walker = new Walker(this)
 
 onmessage = (e: any) => {
     console.log(e.data);

@@ -1,7 +1,17 @@
+// {
+//     "compilerOptions": {
+//         "rootDir": "./ts",
+//         "outDir": "./js",
+//         "target": "ES2015"
+//     }
+// }
 {
     "compilerOptions": {
-        "rootDir": "./ts",
-        "outDir": "./js",
-        "target": "ES2015"
+        "outDir": "./dist/",
+        "noImplicitAny": false,
+        "module": "es6",
+        "target": "es6",
+        "jsx": "react",
+        "allowJs": true
     }
 }

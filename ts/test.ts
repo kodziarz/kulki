@@ -1,7 +1,7 @@
-import Field from "./Field.js";
-import Path from "./Path.js";
-import Walker from "./Walker.js";
-import FieldReachedEvent from "./walkerEvents/FieldReachedEvent.js";
+import Field from "./Field";
+import Path from "./Path";
+import Walker from "./Walker";
+import FieldReachedEvent from "./walkerEvents/FieldReachedEvent";
 
 export default class Test extends EventTarget {
 
@@ -19,4 +19,11 @@ export default class Test extends EventTarget {
         //let walker = new Walker()
         //walker.findPath(new Field(0, 2), new Field(2, 0))
     }
+}
+
+window.onload = () => {
+    let test = new Test()
+    test.addEventListener("onFieldReachedEvent", (e) => {
+        console.log("e.details: ", e);
+    })
 }
