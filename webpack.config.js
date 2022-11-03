@@ -1,7 +1,7 @@
 const path = require('path');
 module.exports = {
     entry: {
-        test: './ts/test.ts',
+        test: './ts/Main.ts',
         worker: './ts/worker.ts'
     },
     output: {

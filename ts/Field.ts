@@ -1,4 +1,4 @@
-import Ball from "./Ball.js"
+import Ball from "./Ball"
 
 export default class Field {
     private _isLegal: boolean
@@ -21,5 +21,20 @@ export default class Field {
 
     getY(): number {
         return this.y
+    }
+
+    /**
+     * Generates {@link Field~Field} instance from JSON data.
+     * @param o JSON object which is going to be parsed.
+     * @returns {@link Field~Field} object parsed from JSON data.
+     */
+    static fromJSON = (o: Object): Field => {
+        let result = Object.fromEntries(Object.entries(o).map(([key, value]) => {
+            if (key == "ball") {
+                return [key, Object.assign(new Ball(), value)]
+            }
+            return [key, value]
+        }))
+        return Object.assign(new Field(result.x, result.y), result)
     }
 }
