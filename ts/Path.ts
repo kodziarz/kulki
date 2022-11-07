@@ -1,4 +1,5 @@
 import Field from "./Field";
+import { NotNull, ValidateNotNull } from "./Validators";
 
 /**
  * Provides access to list of {@link Field~Field | Fields} in currently reaserched path to target.
@@ -29,7 +30,8 @@ export default class Path {
      * @param o JSON object which is going to be parsed.
      * @returns {@link Path~Path} object parsed from JSON data.
      */
-    static fromJSON = (o: Object): Path => {
+    @ValidateNotNull
+    static fromJSON(@NotNull o: Object): Path {
         let result = Object.fromEntries(Object.entries(o).map(([key, value]) => {
             if (key == "fields") {
                 return [key, value.map((field: Field) => {

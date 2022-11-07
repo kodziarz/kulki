@@ -1,4 +1,7 @@
+import Ball, { COLORS } from "./Ball";
 import Board from "./Board";
+import Field from "./Field";
+import SETTINGS from "./settings.json";
 
 /**
  * @module
@@ -7,16 +10,32 @@ import Board from "./Board";
 export default class UIManager {
 
     static CONSTS = {
-        DIV_SIZE: 50
+        FIELD_DIV_SIZE: 50,
+        BALL: {
+            NORMAL_SIZE: 35,
+            MAGNIFIED_SIZE: 45
+        }
     }
 
     root: HTMLDivElement
-    gameboard: Board
+    previewsSectionDiv: HTMLDivElement
+    previewBallDivs: HTMLDivElement[] = []
+    boardDiv: HTMLDivElement
+
+    board: Board
     divs: HTMLDivElement[][]
+    nextBalls: Ball[]
 
     constructor(root: HTMLDivElement) {
         this.root = root
         this.root.style.position = "relative"
+
+        this.previewsSectionDiv = this.createPreviewSectionDiv()
+        this.root.appendChild(this.previewsSectionDiv)
+
+        this.boardDiv = document.createElement("div")
+        this.root.appendChild(this.boardDiv)
+        this.boardDiv.style.position = "relative"
     }
 
     /**
@@ -25,32 +44,202 @@ export default class UIManager {
      * @param board {@link Board~Board} object.
      */
     setGameboard = (board: Board) => {
-        this.gameboard = board
+        this.board = board
         this.divs = [...new Array(board.getWidth())].map((e, x) => { return [...new Array(board.getHeight())].map((e, y) => { return null }) })
 
         this.displayGameboard()
     }
 
+    setNextBalls(balls: Ball[]) {
+
+        this.nextBalls = balls
+        balls.forEach((ball, index) => {
+            let div = this.previewBallDivs[index].children[0] as HTMLDivElement
+            div.style.display = "block"
+            switch (ball.color) {
+                case COLORS.BLACK:
+                    div.style.display = "block"
+                    div.style.backgroundColor = "black"
+                    break
+                case COLORS.BLUE:
+                    div.style.display = "block"
+                    div.style.backgroundColor = "blue"
+                    break
+                case COLORS.GREEN:
+                    div.style.display = "block"
+                    div.style.backgroundColor = "green"
+                    break
+                case COLORS.GREY:
+                    div.style.display = "block"
+                    div.style.backgroundColor = "gray"
+                    break
+                case COLORS.RED:
+                    div.style.display = "block"
+                    div.style.backgroundColor = "red"
+                    break
+                case COLORS.WHITE:
+                    div.style.display = "block"
+                    div.style.backgroundColor = "white"
+                    break
+                case COLORS.YELLOW:
+                    div.style.display = "block"
+                    div.style.backgroundColor = "yellow"
+                    break
+            }
+        })
+
+    }
+
     /**
-     * Displays gameboard basing on {@link gameboard:member} field, which can be set by
+     * Displays gameboard basing on {@link board:member} field, which can be set by
      * {@link setGameboard:function} method.
      */
     displayGameboard = () => {
 
-        this.gameboard.getFields().forEach((column, x) => {
+        this.board.getFields().forEach((column, x) => {
             column.forEach((field, y) => {
-                let div = document.createElement("div")
-                this.root.appendChild(div)
+                let div = this.createFieldDiv()
+                this.boardDiv.appendChild(div)
                 this.divs[x][y] = div
 
-                div.style.position = "absolute"
-                div.style.width = UIManager.CONSTS.DIV_SIZE + "px"
-                div.style.height = UIManager.CONSTS.DIV_SIZE + "px"
-                div.style.left = (x * UIManager.CONSTS.DIV_SIZE) + "px"
-                div.style.top = (y * UIManager.CONSTS.DIV_SIZE) + "px"
-                div.style.border = "1px solid black"
+                div.style.left = (x * UIManager.CONSTS.FIELD_DIV_SIZE) + "px"
+                div.style.top = (y * UIManager.CONSTS.FIELD_DIV_SIZE) + "px"
             })
         })
+    }
+
+    createFieldDiv() {
+        let div = document.createElement("div")
+
+        div.style.position = "absolute"
+        div.style.width = UIManager.CONSTS.FIELD_DIV_SIZE + "px"
+        div.style.height = UIManager.CONSTS.FIELD_DIV_SIZE + "px"
+        div.style.border = "1px solid black"
+        //div.style.padding = "auto"
+
+        let ball = document.createElement("div")
+        div.appendChild(ball)
+        ball.style.width = UIManager.CONSTS.BALL.NORMAL_SIZE + "px"
+        ball.style.height = UIManager.CONSTS.BALL.NORMAL_SIZE + "px"
+        ball.style.margin = "0"
+        ball.style.position = "absolute"
+        ball.style.top = "50%"
+        ball.style.left = "50%"
+        ball.style.transform = "translate(-50%, -50%)"
+        ball.style.borderRadius = "50%"
+        ball.style.border = "1px solid black"
+        ball.style.display = "none"
+
+        let magnifiedBall = document.createElement("div")
+        div.appendChild(magnifiedBall)
+        magnifiedBall.style.width = UIManager.CONSTS.BALL.MAGNIFIED_SIZE + "px"
+        magnifiedBall.style.height = UIManager.CONSTS.BALL.MAGNIFIED_SIZE + "px"
+        magnifiedBall.style.margin = "0"
+        magnifiedBall.style.position = "absolute"
+        magnifiedBall.style.top = "50%"
+        magnifiedBall.style.left = "50%"
+        magnifiedBall.style.transform = "translate(-50%, -50%)"
+        magnifiedBall.style.borderRadius = "50%"
+        magnifiedBall.style.border = "1px solid black"
+        magnifiedBall.style.display = "none"
+
+        return div
+    }
+
+    createPreviewSectionDiv() {
+        let previewDiv = document.createElement("div")
+        previewDiv.style.height = (50 + UIManager.CONSTS.BALL.NORMAL_SIZE) + "px"
+
+        let textDiv = document.createElement("div")
+        previewDiv.appendChild(textDiv)
+        textDiv.innerText = "Następne:"
+        textDiv.style.display = "block"
+
+        let ballsPreviewDiv = document.createElement("div")
+        previewDiv.appendChild(ballsPreviewDiv)
+        previewDiv.style.display = "block"
+        previewDiv.style.position = "relative"
+
+        for (let i = 0; i < SETTINGS.numberOfGeneratedBallsAtATime; i++) {
+            let div = this.createFieldDiv()
+            ballsPreviewDiv.appendChild(div)
+            this.previewBallDivs.push(div)
+
+            div.style.position = "absolute"
+            div.style.left = (i * UIManager.CONSTS.FIELD_DIV_SIZE) + "px"
+        }
+
+        return previewDiv
+    }
+
+    actualiseField(x: number, y: number) {
+        this.formatDivByField(this.divs[x][y], this.board.getField(x, y))
+    }
+
+    private formatDivByField(div: HTMLDivElement, field: Field) {
+        if (field.getBall() == null)
+            this.formatDivAsEmpty(div)
+        else {
+            div.style.backgroundColor = "none"
+            let ball = div.children[0] as HTMLDivElement
+            let magnifiedBall = div.children[1] as HTMLDivElement
+            switch (field.getBall().color) {
+                case COLORS.BLACK:
+                    ball.style.display = "block"
+                    ball.style.backgroundColor = "black"
+                    magnifiedBall.style.backgroundColor = "black"
+                    break
+                case COLORS.BLUE:
+                    ball.style.display = "block"
+                    ball.style.backgroundColor = "blue"
+                    magnifiedBall.style.backgroundColor = "blue"
+                    break
+                case COLORS.GREEN:
+                    ball.style.display = "block"
+                    ball.style.backgroundColor = "green"
+                    magnifiedBall.style.backgroundColor = "green"
+                    break
+                case COLORS.GREY:
+                    ball.style.display = "block"
+                    ball.style.backgroundColor = "gray"
+                    magnifiedBall.style.backgroundColor = "gray"
+                    break
+                case COLORS.RED:
+                    ball.style.display = "block"
+                    ball.style.backgroundColor = "red"
+                    magnifiedBall.style.backgroundColor = "red"
+                    break
+                case COLORS.WHITE:
+                    ball.style.display = "block"
+                    ball.style.backgroundColor = "white"
+                    magnifiedBall.style.backgroundColor = "white"
+                    break
+                case COLORS.YELLOW:
+                    ball.style.display = "block"
+                    ball.style.backgroundColor = "yellow"
+                    magnifiedBall.style.backgroundColor = "yellow"
+                    break
+            }
+        }
+    }
+
+    formatDivAsEmpty(div: HTMLDivElement) {
+        div.style.backgroundColor = "none";
+        (div.children[0] as HTMLDivElement).style.display = "none";
+        (div.children[1] as HTMLDivElement).style.display = "none";
+    }
+
+    formatDivAsSelected(div: HTMLDivElement) {
+        (div.children[0] as HTMLDivElement).style.display = "none";
+        (div.children[1] as HTMLDivElement).style.display = "block";
+    }
+
+    formatDivAsPathPreview(div: HTMLDivElement) {
+        div.style.backgroundColor = "red"
+    }
+
+    formatDivAsTravelledPath(div: HTMLDivElement) {
+        div.style.backgroundColor = "pink"
     }
 
 }

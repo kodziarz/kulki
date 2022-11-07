@@ -1,38 +1,56 @@
+import Ball, { COLORS } from "./Ball";
 import Board from "./Board";
 import Field from "./Field";
+import GameManager from "./GameManager";
 import Path from "./Path";
 import Pathfinder from "./Pathfinder";
 import UIManager from "./UIManager";
 import Walker from "./Walker";
+import SETTINGS from "./settings.json";
 
 export default class Main {
 
     root: HTMLDivElement
     uiDiv: HTMLDivElement
+    board: Board
     uiManager: UIManager
+    gameManager: GameManager
+
+    nextBalls: Ball[]
 
     constructor() {
         this.root = document.getElementById("main") as HTMLDivElement
         this.uiDiv = document.createElement("div")
         this.root.appendChild(this.uiDiv)
 
-        let board = new Board(9, 9)
-
+        this.board = new Board(9, 9)
 
         this.uiManager = new UIManager(this.uiDiv)
-        this.uiManager.setGameboard(board)
+        this.uiManager.setGameboard(this.board)
+
+        this.gameManager = new GameManager(this.board)
+
+        this.startGame()
+        console.log("board: ", this.board);
+
     }
 
-    private test = async () => {
+    private startGame() {
+        this.nextBalls = this.gameManager.generateRandomBalls(SETTINGS.numberOfGeneratedBallsAtATime)
 
+        this.putBallsOnBoard()
+    }
 
-        let board = new Board(9, 9)
-        //console.log("board: ", board);
+    private putBallsOnBoard() {
+        let coords = this.gameManager.pickRandomEmptyFields(SETTINGS.numberOfGeneratedBallsAtATime)
 
-        let pathfinder = new Pathfinder(board)
-        let path = pathfinder.findPath(new Field(0, 0), new Field(8, 8))
-        console.log("path: ", path);
-        console.log("path: ", await path);
+        coords.forEach(({ x, y }, index) => {
+            this.board.getFields()[x][y].setBall(this.nextBalls[index])
+            this.uiManager.actualiseField(x, y)
+        })
+
+        this.nextBalls = this.gameManager.generateRandomBalls(SETTINGS.numberOfGeneratedBallsAtATime)
+        this.uiManager.setNextBalls(this.nextBalls)
     }
 }
 

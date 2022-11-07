@@ -1,6 +1,7 @@
 import Board from "./Board";
 import Field from "./Field";
 import Path from "./Path";
+import { NotNull, ValidateNotNull } from "./Validators";
 
 export default class Walker {
 
@@ -157,7 +158,8 @@ export default class Walker {
      * @param o JSON object which is going to be parsed.
      * @returns {@link Walker~Walker} object parsed from JSON data.
      */
-    static fromJSON = (o: Object): Walker => {
+    @ValidateNotNull
+    static fromJSON(@NotNull o: Object): Walker {
         let result = Object.fromEntries(Object.entries(o).map(([key, value]) => {
             if (key == "path") {
                 return [key, Path.fromJSON(value)]

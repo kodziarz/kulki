@@ -1,4 +1,5 @@
 import Field from "./Field"
+import { NotNull, ValidateNotNull } from "./Validators"
 
 export default class Board {
     private fields: Field[][] = []
@@ -42,16 +43,16 @@ export default class Board {
      * @returns Copy of two-dimensional array of {@link Field~Field | Fields}.
      */
     getFields = (): Field[][] => {
-        return [...this.fields].map((e) => { return [...e] })
+        return this.fields
     }
 
-    //można by zastosować DEKORATOR @notNull czy coś
     /**
      * Generates {@link Board~Board} instance from JSON data.
      * @param o JSON object which is going to be parsed.
      * @returns {@link Board~Board} object parsed from JSON data.
      */
-    static fromJSON = (o: Object): Board => {
+    @ValidateNotNull
+    static fromJSON(@NotNull o: Object): Board {
         if (o == null || o == undefined)
             throw new Error("Board cannot be parsed from null.")
         let result = Object.fromEntries(Object.entries(o).map(([key, value]) => {

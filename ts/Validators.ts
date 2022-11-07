@@ -1,90 +1,91 @@
+import { COLORS } from "./Ball";
 import { PathfinderMessageTypes } from "./PathfinderMessage";
 
-// export const PathfinderMessage = (target: Function) => {
-//     const orginal = target;
+/** @hidden Checks, wheather Class property value belongs to {@link Ball.COLORS} enum. */
+// export function Color(target: any, propertyKey: string): any {
 
-//     const newConstructor: any = function (...args: any[]) {
+//     Object.defineProperty(target, propertyKey, {
+//         get: function () {
+//             return this["_" + propertyKey]
+//         },
+//         set: function (value: number) {
+//             if (!(value in COLORS))
+//                 throw new Error("Wrong color value. Passed color value should belong to COLORS enum.")
+//             this["_" + propertyKey] = value
+//             console.log("target: ", target);
 
-//         // console.log("args:", args); // Array [ 10, 10 ]
-
-//         // this.przedmiot = "Matematyka";
-//         // console.log("undefined:", this.a);  // undefined -> ten dekorator wykonuje przed utworzeniem obiektu (!)
-//         // console.log("this:", this) // Object { przedmiot: "Matematyka" }
-
-//         let result = orginal.apply(this, args);
-
-//         switch (this.type) {
-//             case PathfinderMessageTypes.PATHFIND:
-//                 if (
-//                     this.walker != undefined
-//                     || this.start == undefined
-//                     || this.finish == undefined) {
-//                     throw new InvalidPathfinderMessage()
-//                 }
-//                 break
 //         }
-//         return result;
-//     }
-
-//     return newConstructor;
+//     })
 // }
 
-// export const toJSON = function (target: Object, propertyKey: string | symbol, parameterIndex: number) {
-//     let existingRequiredParameters: number[] = Reflect.getOwnMetadata(requiredMetadataKey, target, propertyKey) || [];
-//     existingRequiredParameters.push(parameterIndex);
-//     Reflect.defineMetadata( requiredMetadataKey, existingRequiredParameters, target, propertyKey);
-//   }
+// export function PathfinderMessageType(target: any, propertyKey: string): any {
+//     Object.defineProperty(target, propertyKey, {
+//         get: function () {
+//             return this["_" + propertyKey]
+//         },
+//         set: function (value: number) {
+//             if (!(value in PathfinderMessageTypes))
+//                 throw new Error("Wrong PathfinderMessageType value. Passed color value should belong to PathfinderMessageTypes enum.")
+//             this["_" + propertyKey] = value
+//             console.log("target: ", target);
 
-// export const PathfinderMessageType = function (target: Function, key: string) {
-//     let value = this[key];
-
-//     const getter = () => {
-//         return value;
-//     }
-
-//     const setter = (newValue) => {
-//         // console.log('set ', value, newValue);
-//         for (let type in PathfinderMessageTypes) {
-//             if (type == newValue) {
-//                 value = newValue
-//                 return
-//             }
 //         }
-//         throw new InvalidPathfinderType()
-//     }
-
-//     if (delete this[key]) {
-//         Object.defineProperty(target, key, {
-//             get: getter,
-//             set: setter,
-//             enumerable: true,
-//             configurable: true
-//         })
-//     }
+//     })
 // }
 
-// export const notNull = function (target: Object, propertyKey: string | symbol, parameterIndex: number) {
-//     let existingRequiredParameters: number[] = Reflect.getOwnMetadata(requiredMetadataKey, target, propertyKey) || [];
-//     existingRequiredParameters.push(parameterIndex);
-//     Reflect.defineMetadata( requiredMetadataKey, existingRequiredParameters, target, propertyKey);
-//   }
-
-export const { } = { xd: "" }
-
-class Exception extends Error {
-    constructor(message: string) {
-        super(message)
+/**
+ *  Restricts property to accept only values listed in given number Enum.
+ * @param enumerator Enumerator which values the property sholud accept.
+ * @remarks It is a property decorator.
+ */
+export function Enumerated(enumerator: any) {
+    return function PathfinderMessageType(target: any, propertyKey: string): any {
+        Object.defineProperty(target, propertyKey, {
+            get: function () {
+                return this["_" + propertyKey]
+            },
+            set: function (value: number) {
+                if (!(value in enumerator))
+                    throw new Error("Wrong field \"" + propertyKey + "\" value. Passed value should belong to enum:\n" + JSON.stringify(enumerator, null, 5))
+                this["_" + propertyKey] = value
+            }
+        })
     }
 }
 
-class InvalidArgumentsException extends Exception {
-    constructor(message: string) {
-        super(message || "Invalid arguments")
-    }
+const notNullPrefix = "__metadata_"
+
+/**Modifies a decorated method, to respect {@link NotNull:function | @NotNull} decoration. */
+export function ValidateNotNull(target: Object, methodName: string, descriptor: PropertyDescriptor) {
+
+    let original = descriptor.value
+
+    let meta: any = Object.getOwnPropertyDescriptor(target, notNullPrefix + methodName)?.value
+
+    if (meta != undefined)
+        descriptor.value = function (...args: any[]) {
+            for (let i of meta)
+                if (args[i] == null)
+                    throw new Error("Parameter number " + i + " was passed null, altough it is annotated with @NotNull decorator.")
+            return original.apply(this, args)
+        }
 }
 
-class InvalidPathfinderType extends InvalidArgumentsException {
-    constructor() {
-        super("Invalid value for Pathfinder.type")
+/**
+ * Restricts decorated parameter not to be null. To work needs the method, where the parameter is, to be
+ * decorated with {@link ValidateNotNull:function | @ValidateNotNull} decorator.
+ */
+export function NotNull(target: any, methodName: string, paramIndex: number): any {
+    //console.log("function: ", target[methodName].toString());
+
+    let currentMeta: any = Object.getOwnPropertyDescriptor(target, notNullPrefix + methodName)?.value
+    if (currentMeta instanceof Array) {
+        Object.defineProperty(target, notNullPrefix + methodName, {
+            value: [...currentMeta, paramIndex]
+        })
+    } else {
+        Object.defineProperty(target, notNullPrefix + methodName, {
+            value: [paramIndex]
+        })
     }
 }
