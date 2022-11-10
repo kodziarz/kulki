@@ -105,17 +105,23 @@ export default class Walker {
         // console.log("this.path.getLastField(): ", this.path.getLastField());
 
         let result: Field[] = []
-        if (this.board.doesFieldExist(lastField.getX() - 1, lastField.getY())) {
-            result.push(this.board.getField(lastField.getX() - 1, lastField.getY()))
+        let lastX = lastField.getX()
+        let lastY = lastField.getY()
+        if (this.board.doesFieldExist(lastX - 1, lastY)
+            && this.board.getField(lastX - 1, lastY).isLegal()) {
+            result.push(this.board.getField(lastX - 1, lastY))
         }
-        if (this.board.doesFieldExist(lastField.getX(), lastField.getY() + 1)) {
-            result.push(this.board.getField(lastField.getX(), lastField.getY() + 1))
+        if (this.board.doesFieldExist(lastX, lastY + 1)
+            && this.board.getField(lastX, lastY + 1).isLegal()) {
+            result.push(this.board.getField(lastX, lastY + 1))
         }
-        if (this.board.doesFieldExist(lastField.getX() + 1, lastField.getY())) {
-            result.push(this.board.getField(lastField.getX() + 1, lastField.getY()))
+        if (this.board.doesFieldExist(lastX + 1, lastY)
+            && this.board.getField(lastX + 1, lastY).isLegal()) {
+            result.push(this.board.getField(lastX + 1, lastY))
         }
-        if (this.board.doesFieldExist(lastField.getX(), lastField.getY() - 1)) {
-            result.push(this.board.getField(lastField.getX(), lastField.getY() - 1))
+        if (this.board.doesFieldExist(lastX, lastY - 1)
+            && this.board.getField(lastX, lastY - 1).isLegal()) {
+            result.push(this.board.getField(lastX, lastY - 1))
         }
         return result
     }

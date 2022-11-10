@@ -7,6 +7,7 @@ import Pathfinder from "./Pathfinder";
 import UIManager from "./UIManager";
 import Walker from "./Walker";
 import SETTINGS from "./settings.json";
+import { NotNull, ValidateNotNull } from "./Validators";
 
 export default class Main {
 
@@ -15,6 +16,7 @@ export default class Main {
     board: Board
     uiManager: UIManager
     gameManager: GameManager
+    pathfinder: Pathfinder
 
     nextBalls: Ball[]
 
@@ -30,12 +32,32 @@ export default class Main {
 
         this.gameManager = new GameManager(this.board)
 
+        this.pathfinder = new Pathfinder(this.board)
+
         this.startGame()
-        console.log("board: ", this.board);
+
+        this.uiManager.onNewStartFieldSelected = (start: Field) => {
+            this.pathfinder = new Pathfinder(this.board)
+            this.pathfinder.findPath(start, this.board.getField(this.board.getWidth() - 1, this.board.getHeight() - 1))
+        }
+        this.uiManager.onPathfindRequest = async (start, finish) => { return await this.pathfinder.findPath(start, finish) }
+        //console.log("board: ", this.board);
+        this.uiManager.onMoveRequest = (start, finish) => {
+            this.board.moveBall(start, finish);
+            this.uiManager.actualiseField(start.getX(), start.getY())
+            this.uiManager.actualiseField(finish.getX(), finish.getY())
+            this.pathfinder = new Pathfinder(this.board)
+            let dells = this.gameManager.countPoints()
+            if (dells.length == 0)
+                this.putBallsOnBoard()
+            else this.uiManager.removeBalls(dells)
+        }
 
     }
 
-    private startGame() {
+    private async startGame() {
+        // wymuszenie, by pathfinder potworzył dużo workerów i "rozruszał" przeglądarkę
+        await this.pathfinder.findPath(this.board.getField(0, 0), this.board.getField(this.board.getWidth() - 1, this.board.getHeight() - 1))
         this.nextBalls = this.gameManager.generateRandomBalls(SETTINGS.numberOfGeneratedBallsAtATime)
 
         this.putBallsOnBoard()

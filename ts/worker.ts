@@ -11,17 +11,20 @@ import { PathfinderMessageTypes, PathfinderMessage } from "./PathfinderMessage";
 import Walker from "./Walker";
 
 let walker = new Walker()
+let id: number = null
 
 // listeners on Walker (child)
 walker.onFieldReached = (walker: Walker) => {
 
     self.postMessage(JSON.parse(JSON.stringify({
+        id: id,
         type: PathfinderMessageTypes.FIELD_REACHED,
         walker: walker
     })) as PathfinderMessage)
 }
 walker.onCoworkerNeeded = (walker: Walker) => {
     self.postMessage(JSON.parse(JSON.stringify({
+        id: id,
         type: PathfinderMessageTypes.COWORKER_NEEDED,
         walker: walker
     })) as PathfinderMessage)
@@ -30,22 +33,20 @@ walker.onCoworkerNeeded = (walker: Walker) => {
 // listeners on self (on events emited by {@link Pathfinder~Pathfinder} who is de facto parent)
 onmessage = (message: any) => {
     let m: PathfinderMessage = message.data
-    // console.log("received message from Pathfinder: ", m);
-    //console.log("self: ", self);
 
     switch (m.type) {
         case PathfinderMessageTypes.PATHFIND:
-            console.log(m.board);
+            id = m.id
             walker.findPath(Board.fromJSON(m.board), Field.fromJSON(m.start), Field.fromJSON(m.finish))
             break
         case PathfinderMessageTypes.CONTINUE_PATHFINDING:
             walker.continuePathfinding()
             break
         case PathfinderMessageTypes.CONTINUE_PATHFINDING_BY_DATA:
+            id = m.id
             walker.continuePathByData(Walker.fromJSON(m.walker))
             break
         default:
-            console.log("message: ", m);
             console.error("Unkown type of Pathfinder message.");
 
     }

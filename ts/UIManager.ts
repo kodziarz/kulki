@@ -1,6 +1,7 @@
 import Ball, { COLORS } from "./Ball";
 import Board from "./Board";
 import Field from "./Field";
+import Path from "./Path";
 import SETTINGS from "./settings.json";
 
 /**
@@ -12,19 +13,30 @@ export default class UIManager {
     static CONSTS = {
         FIELD_DIV_SIZE: 50,
         BALL: {
-            NORMAL_SIZE: 35,
-            MAGNIFIED_SIZE: 45
+            NORMAL_SIZE: 30,
+            MAGNIFIED_SIZE: 40
         }
     }
 
     root: HTMLDivElement
     previewsSectionDiv: HTMLDivElement
     previewBallDivs: HTMLDivElement[] = []
+    pointCounterDiv: HTMLDivElement
     boardDiv: HTMLDivElement
 
     board: Board
     divs: HTMLDivElement[][]
     nextBalls: Ball[]
+
+    selectedField: Field
+    selectedDiv: HTMLDivElement
+
+    onPathfindRequest = async (start: Field, finish: Field): Promise<Path> => { return undefined }
+
+    onNewStartFieldSelected = (start: Field): void => { return undefined }
+
+    onMoveRequest = (start: Field, finish: Field): void => { return undefined }
+
 
     constructor(root: HTMLDivElement) {
         this.root = root
@@ -32,6 +44,9 @@ export default class UIManager {
 
         this.previewsSectionDiv = this.createPreviewSectionDiv()
         this.root.appendChild(this.previewsSectionDiv)
+
+        this.root.appendChild(this.createPointsCounterDiv())
+        this.pointCounterDiv.innerText = "0"
 
         this.boardDiv = document.createElement("div")
         this.root.appendChild(this.boardDiv)
@@ -104,6 +119,8 @@ export default class UIManager {
 
                 div.style.left = (x * UIManager.CONSTS.FIELD_DIV_SIZE) + "px"
                 div.style.top = (y * UIManager.CONSTS.FIELD_DIV_SIZE) + "px"
+
+                this.setFieldOnClicks(div, field)
             })
         })
     }
@@ -146,6 +163,48 @@ export default class UIManager {
         return div
     }
 
+    setFieldOnClicks(div: HTMLDivElement, field: Field) {
+
+        let path: Path = null
+        div.onclick = () => {
+            if (path != null && field.isLegal() && this.selectedField != null) {
+                this.onMoveRequest(this.selectedField, field)
+                this.selectedDiv = null
+                this.selectedField = null
+            }
+        }
+
+        (div.children[0] as HTMLDivElement).onclick = () => {
+            (div.children[0] as HTMLDivElement).style.display = "none";
+            (div.children[1] as HTMLDivElement).style.display = "block"
+            if (this.selectedDiv != null) this.formatDivAsNotSelected(this.selectedDiv)
+            this.selectedDiv = div
+            this.selectedField = field
+            this.onNewStartFieldSelected(field)
+        }
+
+        (div.children[1] as HTMLDivElement).onclick = () => {
+            (div.children[1] as HTMLDivElement).style.display = "none";
+            (div.children[0] as HTMLDivElement).style.display = "block"
+            this.selectedField = null
+            this.clearBoardFromPathPreview()
+        }
+
+        div.onmouseover = async (ev) => {
+            if (this.selectedField != null && field.isLegal()) {
+                this.clearBoardFromPathPreview();
+                path = await this.onPathfindRequest(this.selectedField, field);
+                path.forEachField((fieldFromPath) => {
+                    this.formatDivAsPathPreview(this.divs[fieldFromPath.getX()][fieldFromPath.getY()] as HTMLDivElement)
+                })
+            }
+        }
+
+        div.onmouseout = () => {
+            path = null
+        }
+    }
+
     createPreviewSectionDiv() {
         let previewDiv = document.createElement("div")
         previewDiv.style.height = (50 + UIManager.CONSTS.BALL.NORMAL_SIZE) + "px"
@@ -172,8 +231,33 @@ export default class UIManager {
         return previewDiv
     }
 
+    createPointsCounterDiv() {
+        let div = document.createElement("div")
+
+        let textDiv = document.createElement("div")
+        div.appendChild(textDiv)
+        textDiv.innerHTML = "Punkty:&nbsp;"
+        textDiv.style.display = "inline-block"
+
+        let numberDiv = document.createElement("div")
+        div.appendChild(numberDiv)
+        this.pointCounterDiv = numberDiv
+        numberDiv.style.display = "inline-block"
+
+        return div
+    }
+
     actualiseField(x: number, y: number) {
         this.formatDivByField(this.divs[x][y], this.board.getField(x, y))
+        this.clearBoardFromPathPreview()
+    }
+
+    removeBalls(fields: Field[]) {
+        fields.forEach((field) => {
+            this.board.getField(field.getX(), field.getY()).deleteBall()
+            this.actualiseField(field.getX(), field.getY())
+        })
+        this.pointCounterDiv.innerText = parseInt(this.pointCounterDiv.innerText) + fields.length + ""
     }
 
     private formatDivByField(div: HTMLDivElement, field: Field) {
@@ -234,8 +318,21 @@ export default class UIManager {
         (div.children[1] as HTMLDivElement).style.display = "block";
     }
 
+    formatDivAsNotSelected(div: HTMLDivElement) {
+        (div.children[0] as HTMLDivElement).style.display = "block";
+        (div.children[1] as HTMLDivElement).style.display = "none";
+    }
+
     formatDivAsPathPreview(div: HTMLDivElement) {
         div.style.backgroundColor = "red"
+    }
+
+    clearBoardFromPathPreview() {
+        this.divs.forEach((column, x) => {
+            column.forEach((div, y) => {
+                div.style.backgroundColor = "white"
+            })
+        })
     }
 
     formatDivAsTravelledPath(div: HTMLDivElement) {

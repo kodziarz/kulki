@@ -40,6 +40,7 @@ export enum PathfinderMessageTypes {
  * Structure used for communication between {@link Pathfinder~Pathfinder} and {@link worker | Workers}
  */
 export interface PathfinderMessage {
+    id?: number;
     /**
      * Type from {@link PathfinderMessageTypes}.
      */

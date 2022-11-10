@@ -35,7 +35,7 @@ export default class Pathfinder {
     constructor(board: Board) {
         this.gameBoard = board
         this.shortestPathsTo = [... new Array(board.getWidth())].map(() => { return (new Array(board.getHeight())).fill(null) })
-        console.log("shortestPathsTo: ", this.shortestPathsTo);
+        //console.log("shortestPathsTo: ", this.shortestPathsTo);
 
     }
 
@@ -116,7 +116,7 @@ export default class Pathfinder {
 
                         if (this.walkerDidReachedFinish(m.walker)) {
                             this.shortestFinishedPathLength = m.walker.getPath().getLength()
-                            console.log("Reached the end with path: ", m.walker.getPath());
+                            //console.log("Reached the end with path: ", m.walker.getPath());
                         } else {
                             this.createNewWorker({
                                 type: PathfinderMessageTypes.CONTINUE_PATHFINDING_BY_DATA,

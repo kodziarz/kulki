@@ -11,7 +11,7 @@ export enum COLORS {
     GREY
 }
 
-class Ball {
+export default class Ball {
 
     @Enumerated(COLORS)
     readonly color: number
@@ -22,7 +22,7 @@ class Ball {
     }
 }
 
-export default Ball
+//export default Ball
 
 // function color(): any {
 

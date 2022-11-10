@@ -8,6 +8,11 @@ export default class Board {
         this.fields = [...new Array(w)].map((e, x) => { return [...new Array(h)].map((e, y) => { return new Field(x, y) }) })
     }
 
+    moveBall(start: Field, finish: Field) {
+        finish.setBall(start.getBall())
+        start.deleteBall()
+    }
+
     /**
      * Checks if such a {@link Field~Field} exists on the {@link Board~Board}
      * @param x X coordinate of {@link Field~Field}.

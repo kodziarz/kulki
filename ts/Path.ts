@@ -25,6 +25,12 @@ export default class Path {
         return this.fields.length
     }
 
+    forEachField(callback: (field: Field, i?: number) => void): void {
+        this.fields.forEach((field: Field, i) => {
+            callback(field, i)
+        })
+    }
+
     /**
      * Generates {@link Path~Path} instance from JSON data.
      * @param o JSON object which is going to be parsed.

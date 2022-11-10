@@ -1,3 +1,4 @@
 {
-    "numberOfGeneratedBallsAtATime": 3
+    "numberOfGeneratedBallsAtATime": 3,
+    "requiredNumberOfBallsInARow": 5
 }
