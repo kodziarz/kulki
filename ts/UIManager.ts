@@ -60,7 +60,7 @@ export default class UIManager {
      */
     setGameboard = (board: Board) => {
         this.board = board
-        this.divs = [...new Array(board.getWidth())].map((e, x) => { return [...new Array(board.getHeight())].map((e, y) => { return null }) })
+        this.divs = [...new Array(board.getWidth())].map((e, _x) => { return [...new Array(board.getHeight())].map((e, _y) => { return null }) })
 
         this.displayGameboard()
     }
