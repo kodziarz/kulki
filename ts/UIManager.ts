@@ -175,8 +175,7 @@ export default class UIManager {
         }
 
         (div.children[0] as HTMLDivElement).onclick = () => {
-            (div.children[0] as HTMLDivElement).style.display = "none";
-            (div.children[1] as HTMLDivElement).style.display = "block"
+            this.formatDivAsSelected(div)
             if (this.selectedDiv != null) this.formatDivAsNotSelected(this.selectedDiv)
             this.selectedDiv = div
             this.selectedField = field
@@ -184,9 +183,9 @@ export default class UIManager {
         }
 
         (div.children[1] as HTMLDivElement).onclick = () => {
-            (div.children[1] as HTMLDivElement).style.display = "none";
-            (div.children[0] as HTMLDivElement).style.display = "block"
+            this.formatDivAsNotSelected(div)
             this.selectedField = null
+            this.selectedDiv = null
             this.clearBoardFromPathPreview()
         }
 

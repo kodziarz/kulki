@@ -2,12 +2,9 @@ import Ball, { COLORS } from "./Ball";
 import Board from "./Board";
 import Field from "./Field";
 import GameManager from "./GameManager";
-import Path from "./Path";
 import Pathfinder from "./Pathfinder";
 import UIManager from "./UIManager";
-import Walker from "./Walker";
 import SETTINGS from "./settings.json";
-import { NotNull, ValidateNotNull } from "./Validators";
 
 export default class Main {
 
