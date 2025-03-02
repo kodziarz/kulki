@@ -54,7 +54,7 @@ export default class Main {
 
     private async startGame() {
         // wymuszenie, by pathfinder potworzył dużo workerów i "rozruszał" przeglądarkę
-        await this.pathfinder.findPath(this.board.getField(0, 0), this.board.getField(this.board.getWidth() - 1, this.board.getHeight() - 1))
+        // await this.pathfinder.findPath(this.board.getField(0, 0), this.board.getField(this.board.getWidth() - 1, this.board.getHeight() - 1))
         this.nextBalls = this.gameManager.generateRandomBalls(SETTINGS.numberOfGeneratedBallsAtATime)
 
         this.putBallsOnBoard()
