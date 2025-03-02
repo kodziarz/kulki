@@ -65,7 +65,14 @@ export default class Walker {
             this.onCoworkerNeeded(coworker)
         }
 
-        this.path.addField(possible[0])
+        if (possible.length != 0) {
+            // the exception is when there is a single legal field next to start.
+            // then the Walker starts in it and has no possible moves
+            // (Walker cannot even return - start is always illegal, since there is a ball)
+            this.path.addField(possible[0])
+        }
+        // when no legal move, then return current path - it will be discarded,
+        // since it is not better then current 
         this.onFieldReached(this)
     }
 

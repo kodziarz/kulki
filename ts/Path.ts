@@ -40,6 +40,8 @@ export default class Path {
     static fromJSON(@NotNull o: Object): Path {
         let result = Object.fromEntries(Object.entries(o).map(([key, value]) => {
             if (key == "fields") {
+                console.log(`path.fields: ${value}`);
+
                 return [key, value.map((field: Field) => {
                     return Field.fromJSON(field)
                 })]

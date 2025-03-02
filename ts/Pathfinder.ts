@@ -82,8 +82,8 @@ export default class Pathfinder {
                 case PathfinderMessageTypes.FIELD_REACHED:
 
                     m.walker = Walker.fromJSON(m.walker)
-                    // console.log("FIELD_REACHED");
-                    // console.log("message: ", m);
+                    console.log("FIELD_REACHED");
+                    console.log("message: ", m);
                     // debugger
 
 
@@ -148,7 +148,7 @@ export default class Pathfinder {
     private canWorkerBeFastest = (walker: Walker) => {
         let checkedPath: Path = walker.getPath()
 
-        if (this.shortestFinishedPathLength != null && checkedPath.getLength() < this.shortestFinishedPathLength)
+        if (this.shortestFinishedPathLength != null && checkedPath.getLength() >= this.shortestFinishedPathLength)
             return false
         let field: Field = checkedPath.getLastField()
         let currentPath = this.shortestPathsTo[field.getX()][field.getY()]
@@ -184,6 +184,7 @@ export default class Pathfinder {
      * @public
      */
     private finishPathfinding = () => {
+        console.debug("Pathfinder found solution: ", this.shortestPathsTo[this.finish.getX()][this.finish.getY()])
         this.resolve(this.shortestPathsTo[this.finish.getX()][this.finish.getY()])
     }
 
