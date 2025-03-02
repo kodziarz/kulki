@@ -193,9 +193,11 @@ export default class UIManager {
             if (this.selectedField != null && field.isLegal()) {
                 this.clearBoardFromPathPreview();
                 path = await this.onPathfindRequest(this.selectedField, field);
-                path.forEachField((fieldFromPath) => {
-                    this.formatDivAsPathPreview(this.divs[fieldFromPath.getX()][fieldFromPath.getY()] as HTMLDivElement)
-                })
+                if (path) {
+                    path.forEachField((fieldFromPath) => {
+                        this.formatDivAsPathPreview(this.divs[fieldFromPath.getX()][fieldFromPath.getY()] as HTMLDivElement)
+                    })
+                }
             }
         }
 
